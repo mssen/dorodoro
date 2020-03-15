@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+import useInterval from './hooks/useInterval';
+
+const App: React.FC = () => {
+  const [isRunning, setIsRunning] = useState(true);
+  const [time, setTime] = useState(1500);
+
+  useInterval(
+    () => {
+      setTime(prevTime => prevTime - 1);
+    },
+    isRunning ? 1000 : null
   );
-}
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <main>
+      {formatTime(time)}
+      <button onClick={() => setIsRunning(prevIsRunning => !prevIsRunning)}>
+        {isRunning ? 'Pause' : 'Unpause'}
+      </button>
+    </main>
+  );
+};
 
 export default App;
