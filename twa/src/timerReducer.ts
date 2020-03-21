@@ -44,7 +44,7 @@ type Actions = ReturnType<
 export const initialState = {
   time: initialTimes[Status.WORK],
   status: Status.WORK,
-  isPauseed: false,
+  isPauseed: true,
   completedWorkSets: 0
 };
 
