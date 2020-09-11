@@ -37,7 +37,7 @@ export const actions = {
   togglePause
 };
 
-type Actions = ReturnType<
+type Action = ReturnType<
   typeof reset | typeof tick | typeof next | typeof togglePause
 >;
 
@@ -69,7 +69,7 @@ const getNextStatusState = (status: Status, completedWorkSets: number) => {
   }
 };
 
-export const reducer = (state: State, action: Actions): State => {
+export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'RESET': {
       return { ...state, time: initialTimes[state.status] };
