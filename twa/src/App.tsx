@@ -9,12 +9,20 @@ const Main = styled.main`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: #d50a16ed;
 `;
 
 const TimerContainer = styled.article`
   display: flex;
   flex-flow: column;
   align-items: center;
+`;
+
+const TimerText = styled.span`
+  color: #fff;
+  font-size: 4em;
+  font-weight: bold;
+  text-shadow: 3px 2px 3px hsla(0, 0%, 0%, 0.4);
 `;
 
 const ButtonContainer = styled.section`
@@ -45,7 +53,7 @@ const App: React.FC = () => {
   return (
     <Main>
       <TimerContainer>
-        {formatTime(state.time)}
+        <TimerText>{formatTime(state.time)}</TimerText>
         <ButtonContainer>
           <button onClick={reset}>Reset</button>
           <button onClick={togglePause}>
