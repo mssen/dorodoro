@@ -1,7 +1,7 @@
-import React, { useReducer } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-import { reducer, initialState, actions } from './timerReducer';
+import useTimer from './timerReducer';
 import useInterval from './hooks/useInterval';
 
 const Main = styled.main`
@@ -30,13 +30,13 @@ const ButtonContainer = styled.section`
 `;
 
 const App: React.FC = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const timer = useTimer();
 
   useInterval(
     () => {
-      dispatch(actions.tick());
+      timer.actions.tick();
     },
-    state.isPauseed ? null : 1000
+    timer.state.isPauseed ? null : 1000
   );
 
   const formatTime = (time: number) => {
@@ -46,20 +46,16 @@ const App: React.FC = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const reset = () => dispatch(actions.reset());
-  const togglePause = () => dispatch(actions.togglePause());
-  const skip = () => dispatch(actions.next());
-
   return (
     <Main>
       <TimerContainer>
-        <TimerText>{formatTime(state.time)}</TimerText>
+        <TimerText>{formatTime(timer.state.time)}</TimerText>
         <ButtonContainer>
-          <button onClick={reset}>Reset</button>
-          <button onClick={togglePause}>
-            {state.isPauseed ? 'Unpause' : 'Pause'}
+          <button onClick={timer.actions.reset}>Reset</button>
+          <button onClick={timer.actions.togglePause}>
+            {timer.state.isPauseed ? 'Unpause' : 'Pause'}
           </button>
-          <button onClick={skip}>Skip</button>
+          <button onClick={timer.actions.next}>Skip</button>
         </ButtonContainer>
       </TimerContainer>
     </Main>

@@ -1,54 +1,60 @@
+import { useReducer, Dispatch } from 'react';
+
 export enum Status {
   WORK,
   SHORT_BREAK,
-  LONG_BREAK
+  LONG_BREAK,
 }
 
 const initialTimes: Record<Status, number> = {
   [Status.WORK]: 1500,
   [Status.SHORT_BREAK]: 300,
-  [Status.LONG_BREAK]: 900
+  [Status.LONG_BREAK]: 900,
 };
+
+// -- ACTIONS
 
 const reset = () =>
   ({
-    type: 'RESET'
+    type: 'RESET',
   } as const);
 
 const tick = () =>
   ({
-    type: 'TICK'
+    type: 'TICK',
   } as const);
 
 const next = () =>
   ({
-    type: 'NEXT'
+    type: 'NEXT',
   } as const);
 
 const togglePause = () =>
   ({
-    type: 'TOGGLE_PAUSE'
+    type: 'TOGGLE_PAUSE',
   } as const);
 
-export const actions = {
-  reset,
-  tick,
-  next,
-  togglePause
-};
-
-type Action = ReturnType<
+type TimerAction = ReturnType<
   typeof reset | typeof tick | typeof next | typeof togglePause
 >;
 
-export const initialState = {
+const actions = (dispatch: Dispatch<TimerAction>) => ({
+  reset: () => dispatch(reset()),
+  tick: () => dispatch(tick()),
+  next: () => dispatch(next()),
+  togglePause: () => dispatch(togglePause()),
+});
+
+// -- STATE
+
+const defaultState = {
   time: initialTimes[Status.WORK],
   status: Status.WORK,
   isPauseed: true,
-  completedWorkSets: 0
+  completedWorkSets: 0,
 };
 
-type State = typeof initialState;
+type TimerState = typeof defaultState;
 
 const getNextStatusState = (status: Status, completedWorkSets: number) => {
   if (status === Status.WORK) {
@@ -59,17 +65,17 @@ const getNextStatusState = (status: Status, completedWorkSets: number) => {
     return {
       time: initialTimes[nextStatus],
       status: nextStatus,
-      completedWorkSets: completedWorkSets + 1
+      completedWorkSets: completedWorkSets + 1,
     };
   } else {
     return {
       time: initialTimes[Status.WORK],
-      status: Status.WORK
+      status: Status.WORK,
     };
   }
 };
 
-export const reducer = (state: State, action: Action): State => {
+const reducer = (state: TimerState, action: TimerAction): TimerState => {
   switch (action.type) {
     case 'RESET': {
       return { ...state, time: initialTimes[state.status] };
@@ -77,7 +83,7 @@ export const reducer = (state: State, action: Action): State => {
     case 'NEXT': {
       return {
         ...state,
-        ...getNextStatusState(state.status, state.completedWorkSets)
+        ...getNextStatusState(state.status, state.completedWorkSets),
       };
     }
     case 'TICK': {
@@ -85,7 +91,7 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         time: state.time - 1,
         ...(state.time === 1 &&
-          getNextStatusState(state.status, state.completedWorkSets))
+          getNextStatusState(state.status, state.completedWorkSets)),
       };
     }
     case 'TOGGLE_PAUSE': {
@@ -96,3 +102,17 @@ export const reducer = (state: State, action: Action): State => {
     }
   }
 };
+
+// -- HOOK
+
+export interface TimerHook {
+  state: TimerState;
+  actions: ReturnType<typeof actions>;
+}
+
+const useTimer = (initialState: TimerState = defaultState): TimerHook => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return { state, actions: actions(dispatch) };
+};
+
+export default useTimer;
